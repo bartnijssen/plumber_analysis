@@ -1,9 +1,11 @@
 # exclude data and pickle directories
 data
 data/
-pickle/
+pickle*/
 # exclude build path
 build/
 # exclude output and plot directories
 output/
 plots/
+# exclude logs
+logs/
