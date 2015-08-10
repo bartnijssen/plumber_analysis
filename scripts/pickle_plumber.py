@@ -1,6 +1,8 @@
 import plumber.plumber as pl
-configfile = '/Users/nijssen/Dropbox/data/PLUMBER/test/plumber.config'
+pickle_id ='all_daf57aaa'
+configfile = '/Users/nijssen/Dropbox/data/PLUMBER/plumber_analysis/config/plumber.config'
 b = pl.PlumberAnalysis(configfile)
 b.ingestall()
-ppath = '/Users/nijssen/Dropbox/data/PLUMBER/PLUMBER_data/pickle'
+ppath = '/Users/nijssen/Dropbox/data/PLUMBER/plumber_analysis/pickles/{}'.\
+        format(pickle_id)
 b.store(ppath)
