@@ -1,0 +1,9 @@
+# exclude data and pickle directories
+data
+data/
+pickle/
+# exclude build path
+build/
+# exclude output and plot directories
+output/
+plots/
