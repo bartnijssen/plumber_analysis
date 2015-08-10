@@ -4,7 +4,17 @@
 
 There is a lot of inconsistency between the time axes used by the different models. This complicates analysis with packages (such as python's pandas) that can actually use the time stamp to do sophisticated time series analysis. All of these problems can be managed by simply using the index (except for CHTESSEL, which has multiple problems), but this should be resolved by replacing the time axis with the correct values.
 
-### Period
+### Extent of period covered
+Four sites have record lengths that are inconsistent with [Table 1 in Best et al. 2015](http://journals.ametsoc.org/action/showFullPopup?doi=10.1175%2FJHM-D-14-0158.1&id=_i6).
+
+|Location | Period in data files | Period in [Table 1](http://journals.ametsoc.org/action/showFullPopup?doi=10.1175%2FJHM-D-14-0158.1&id=_i6)|
+|:-------------|-------------:|-----:|
+|Bugac        | 2003 2006 | 2002 2006|
+|ElSaler      | 1999 2006 | 2003 2006|
+|Espirra      | 2002 2005 | 2001 2006|
+|Hesse        | 2001 2006 | 1999 2006|
+
+### Averaging period
  * CHTESSEL appears to have a timestamp that denotes the beginning of the time step (precedes other models by 30 minutes). However, this is not entirely clear, because CHTESSEL also includes one extra time step per year compared to all the other models.
  * COLASSiB.2.0 has a timestamp that is delayed by 30 minutes compared to the other models. This just seems to be an error.
  * ORCHIDEE.trunk_r1402 uses time bounds to denote the interval over which the value is valid. While this may be the most correct way of providing time information, it requires additional handling of the time axis, which is probably not necessary.
