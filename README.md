@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bartnijssen/plumber_analysis.svg?branch=develop)](https://travis-ci.org/bartnijssen/plumber_analysis)[![Code Health](https://landscape.io/github/bartnijssen/plumber_analysis/develop/landscape.svg?style=flat-square)](https://landscape.io/github/bartnijssen/plumber_analysis/develop)
+[![Build Status](https://travis-ci.org/bartnijssen/plumber_analysis.svg?branch=master)](https://travis-ci.org/bartnijssen/plumber_analysis)[![Code Health](https://landscape.io/github/bartnijssen/plumber_analysis/master/landscape.svg?style=flat-square)](https://landscape.io/github/bartnijssen/plumber_analysis/master)
 # plumber
 
 This is a python toolkit to read and analyze results from the *PLUMBER* experiment ([Best et al. 2015](http://dx.doi.org/10.1175/jhm-d-14-0158.1)), which consists of output from land surface models, statistical benchmark models, and conceptual benchmark models at selected FLUXNET sites.
