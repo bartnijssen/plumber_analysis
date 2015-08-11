@@ -11,6 +11,14 @@ def budyko(x):
     b = np.sqrt(b)
     return b
 
+def cast(x):
+    for f in (int, float, tobool):
+        try:
+            return f(x)
+        except:
+            pass
+    return x
+
 def Lv(T, units='K'):
     """Calculate the latent heat of vaporization as a function of temperature.
        Results are in J/kg
@@ -24,3 +32,13 @@ def Lv(T, units='K'):
     L = 2500.8 - 2.36*T + 0.0016*T**2 - 0.00006*T**3
     L *= 1000.
     return L
+
+def tobool(x):
+    """Convert a string to a boolean value. Just throw exception if it does not
+       work."""
+    if x.lower() == 'true':
+        return True
+    elif x.lower() == 'false':
+        return False
+    else:
+        raise ValueError

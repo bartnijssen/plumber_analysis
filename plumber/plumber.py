@@ -2,31 +2,15 @@ import collections
 import configparser
 import logging
 from pprint import pprint
-from . import io
 import os
 import pickle
 import re
 import sys
 
+from . import io
+from . import utils
+
 loglevel_default = 'info'
-
-def tobool(x):
-    """Convert a string to a boolean value. Just throw exception if it does not
-       work."""
-    if x.lower() == 'true':
-        return True
-    elif x.lower() == 'false':
-        return False
-    else:
-        raise ValueError
-
-def cast(x):
-    for f in (int, float, tobool):
-        try:
-            return f(x)
-        except:
-            pass
-    return x
 
 class PlumberAnalysis(object):
     """Overarching class for organizing analysis of the PLUMBER dataset.
@@ -118,9 +102,9 @@ class PlumberAnalysis(object):
                     self.cfg[section][key] = [x.strip() for x in val.split(',')]
                 if isinstance(self.cfg[section][key], list):
                     self.cfg[section][key] = \
-                        [cast(x) for x in self.cfg[section][key]]
+                        [utils.cast(x) for x in self.cfg[section][key]]
                 else:
-                    self.cfg[section][key] = cast(self.cfg[section][key])
+                    self.cfg[section][key] = utils.cast(self.cfg[section][key])
         logging.debug('Parsed configuration file {}'.format(self.configfile))
 
     @classmethod
