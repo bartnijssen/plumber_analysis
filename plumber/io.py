@@ -3,7 +3,6 @@ io module for plumber data
 """
 import logging
 import re
-import pandas as pd
 import xray
 
 def ingest(infile, read_vars, tshift=None):
@@ -38,8 +37,7 @@ def ingest(infile, read_vars, tshift=None):
         try:
             read_vars = read_vars.copy()
         except AttributeError as err:
-            logging.critical('{}: read_vars should be a list or \'all\''.\
-                              format(err))
+            logging.critical('%s: read_vars should be a list or \'all\'', err)
             raise
 
     # read infile using xray
@@ -67,7 +65,7 @@ def ingest(infile, read_vars, tshift=None):
         if 'Rnet' not in ds.variables:
             try:
                 ds['Rnet'] = ds['SWnet'] + ds['LWnet']
-            except:
+            except KeyError:
                 pass
 
     # drop all variables that are not in read_vars (but keep time)

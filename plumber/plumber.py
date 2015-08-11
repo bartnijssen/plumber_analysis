@@ -1,7 +1,5 @@
-import collections
 import configparser
 import logging
-from pprint import pprint
 import os
 import pickle
 import re
@@ -46,7 +44,7 @@ class PlumberAnalysis(object):
             self.data[site] = {}
             self.data_dict[site] = []
         self.data[site][source] = io.ingest(*args, **kwargs)
-        logging.debug('Loaded {} {}'.format(site, source))
+        logging.debug('Loaded %s %s', site, source)
         if source not in self.data_dict[site]:
             self.data_dict[site].append(source)
 
@@ -57,7 +55,7 @@ class PlumberAnalysis(object):
             for source in self.cfg['sources'][category]:
                 try:
                     tshift = self.cfg['tshifts'][source.lower()]
-                except:
+                except KeyError:
                     tshift = None
                 for site in self.cfg['sites']['sites']:
                     infile = self.cfg['filetemplates']\
@@ -84,7 +82,7 @@ class PlumberAnalysis(object):
                                       interpolation=\
                                       configparser.ExtendedInterpolation())
         cfgparser.optionxform = str # preserve case of configuration keys
-        logging.debug('Reading {}'.format(self.configfile))
+        logging.debug('Reading %s', self.configfile)
         cfgparser.read(self.configfile)
         # convert the cfgparser to an easier to handle dictionary
         self.cfg = {}
@@ -105,7 +103,7 @@ class PlumberAnalysis(object):
                         [utils.cast(x) for x in self.cfg[section][key]]
                 else:
                     self.cfg[section][key] = utils.cast(self.cfg[section][key])
-        logging.debug('Parsed configuration file {}'.format(self.configfile))
+        logging.debug('Parsed configuration file %s', self.configfile)
 
     @classmethod
     def restore(cls, path):
@@ -148,7 +146,7 @@ class PlumberAnalysis(object):
         # Create path
         try:
             os.makedirs(path)
-        except:
+        except os.error:
             pass
         # pickle the class instance
         pfile = os.path.join(path, 'class_instance.pickle')
@@ -166,7 +164,7 @@ if __name__ == '__main__':
     # get configuration file from command-line
     try:
         configfile = sys.argv[1]
-    except:
+    except IndexError:
         sys.exit('Usage: {} <configuration file>'.format(sys.argv[0]))
 
     # parse configuration file to get logging info
@@ -177,19 +175,17 @@ if __name__ == '__main__':
     cfgparser.optionxform = str # preserve case of configuration keys
     cfgparser.read(configfile)
 
-    # initiate logging
-    try:
-        logfile = cfgparser.get('LOGGING', 'logfile')
-    except:
-        logfile = None
+    # initiate logging - note that cfgparser.get() returns None when the entry
+    # does not exist
+    logfile = cfgparser.get('LOGGING', 'logfile')
     if logfile:
         try:
             loglevel = cfgparser.get('LOGGING', 'loglevel').upper()
-        except:
+        except AttributeError:
             loglevel = loglevel_default.upper()
         loglevel = getattr(logging, loglevel)
         logging.basicConfig(filename=logfile, filemode='w', level=loglevel)
-        logging.debug('Initiated logging to logfile  {}'.format(logfile))
+        logging.debug('Initiated logging to logfile %s', logfile)
     else:
         logger = logging.getLogger()
         logger.disabled = True

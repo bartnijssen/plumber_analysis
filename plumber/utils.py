@@ -15,7 +15,7 @@ def cast(x):
     for f in (int, float, tobool):
         try:
             return f(x)
-        except:
+        except (TypeError, ValueError):
             pass
     return x
 
