@@ -1,12 +1,9 @@
-import configparser
 import logging
 import os
 import pickle
-import re
 import sys
 
 from . import io
-from . import utils
 
 loglevel_default = 'info'
 
@@ -17,9 +14,10 @@ class PlumberAnalysis(object):
 
     def __init__(self, configfile=None):
         """Initialize PlumberAnalysis instance based on a configuration file"""
+        self.cfg = {}
         self.configfile = configfile
         if self.configfile:
-            self.parseconfig(self.configfile)
+            self.cfg = io.parseconfig(self.configfile)
         self.data = {}
         # Since data is not pickled as part of the class instance, we maintain
         # a separate data_dict to help restore_data()
@@ -70,40 +68,6 @@ class PlumberAnalysis(object):
                 infile = self.cfg['filetemplates'][category+'_file_template'].\
                              format(site=site)
                 self.ingest(site, category, infile, read_vars=read_vars)
-
-    def parseconfig(self, configfile=None):
-        """Parse a configuration file for PlumberAnalysis"""
-        if configfile:
-            self.configfile = configfile
-        if self.configfile is None:
-            return
-        cfgparser = \
-            configparser.ConfigParser(allow_no_value=True,
-                                      interpolation=\
-                                      configparser.ExtendedInterpolation())
-        cfgparser.optionxform = str # preserve case of configuration keys
-        logging.debug('Reading %s', self.configfile)
-        cfgparser.read(self.configfile)
-        # convert the cfgparser to an easier to handle dictionary
-        self.cfg = {}
-        for section in cfgparser.sections():
-            self.cfg[section.lower()] = {}
-            for key in cfgparser[section]:
-                self.cfg[section.lower()][key.lower()] = \
-                    cfgparser[section][key]
-
-        # convert dictionary values. First convert any comma-separated entries
-        # to lists, then convert entries to boolean, ints, and floats
-        for section, options in self.cfg.items():
-            for key, val in options.items():
-                if re.search(',', val):
-                    self.cfg[section][key] = [x.strip() for x in val.split(',')]
-                if isinstance(self.cfg[section][key], list):
-                    self.cfg[section][key] = \
-                        [utils.cast(x) for x in self.cfg[section][key]]
-                else:
-                    self.cfg[section][key] = utils.cast(self.cfg[section][key])
-        logging.debug('Parsed configuration file %s', self.configfile)
 
     @classmethod
     def restore(cls, path):

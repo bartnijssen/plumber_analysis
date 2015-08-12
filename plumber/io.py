@@ -1,9 +1,12 @@
 """
 io module for plumber data
 """
+import configparser
 import logging
 import re
 import xray
+
+from . import utils
 
 def ingest(infile, read_vars, tshift=None):
     """
@@ -90,3 +93,35 @@ def ingest(infile, read_vars, tshift=None):
     df = df.asfreq('30Min', method='nearest')
 
     return df
+
+def parseconfig(configfile=None):
+    """Parse a configuration file and return the configuration as a
+       dictionary"""
+    if configfile is None:
+        return {}
+    cfgparser = \
+        configparser.ConfigParser(allow_no_value=True,
+                                  interpolation=\
+                                  configparser.ExtendedInterpolation())
+    cfgparser.optionxform = str # preserve case of configuration keys
+    logging.debug('Reading %s', configfile)
+    cfgparser.read(configfile)
+    # convert the cfgparser to an easier to handle dictionary
+    cfg = {}
+    for section in cfgparser.sections():
+        cfg[section.lower()] = {}
+        for key in cfgparser[section]:
+            cfg[section.lower()][key.lower()] = cfgparser[section][key]
+
+    # convert dictionary values. First convert any comma-separated entries
+    # to lists, then convert entries to boolean, ints, and floats
+    for section, options in cfg.items():
+        for key, val in options.items():
+            if re.search(',', val):
+                cfg[section][key] = [x.strip() for x in val.split(',')]
+            if isinstance(cfg[section][key], list):
+                cfg[section][key] = [utils.cast(x) for x in cfg[section][key]]
+            else:
+                cfg[section][key] = utils.cast(cfg[section][key])
+    logging.debug('Parsed configuration file %s', configfile)
+    return cfg
