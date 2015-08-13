@@ -9,6 +9,6 @@ setup(name='plumber_analysis',
       author_email='nijssen@uw.edu',
       url='http://www.github.com/bartnijssen/plumber_analysis',
       packages=['plumber'],
-      py_modules=['plumber.io', 'plumber.plot', 'plumber.plumber',
-                  'plumber.utils'],
-     )
+      py_modules=['plumber.fargs', 'plumber.io', 'plumber.plot',
+                  'plumber.plumber', 'plumber.utils']
+      )
