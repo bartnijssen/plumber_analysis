@@ -8,6 +8,7 @@ import xray
 
 from . import utils
 
+
 def ingest(infile, read_vars, tshift=None):
     """
     read input and output files from the plumber experiment
@@ -30,8 +31,8 @@ def ingest(infile, read_vars, tshift=None):
         data frame with those elements in read_vars that are present in infile
 
     The returned dataframe is not guaranteed to have all the variables that are
-    specified in read_vars. It will only include those that are available. It is
-    up to the user to check for completeness.
+    specified in read_vars. It will only include those that are available. It
+    is up to the user to check for completeness.
     """
 
     # make a copy of read_vars since we don't want to change the list in the
@@ -51,7 +52,7 @@ def ingest(infile, read_vars, tshift=None):
 
     # rename the time dimension to 'time' to make life easier
     if time_dim != 'time':
-        ds.rename({time_dim : 'time'}, inplace=True)
+        ds.rename({time_dim: 'time'}, inplace=True)
 
     # only keep the time dimension, drop the others
     dims = [x for x in ds.dims if x != 'time']
@@ -94,6 +95,7 @@ def ingest(infile, read_vars, tshift=None):
 
     return df
 
+
 def parseconfig(configfile=None):
     """Parse a configuration file and return the configuration as a
        dictionary"""
@@ -101,9 +103,10 @@ def parseconfig(configfile=None):
         return {}
     cfgparser = \
         configparser.ConfigParser(allow_no_value=True,
-                                  interpolation=\
-                                  configparser.ExtendedInterpolation())
-    cfgparser.optionxform = str # preserve case of configuration keys
+                                  interpolation=configparser.
+                                  ExtendedInterpolation())
+
+    cfgparser.optionxform = str  # preserve case of configuration keys
     logging.debug('Reading %s', configfile)
     cfgparser.read(configfile)
     # convert the cfgparser to an easier to handle dictionary

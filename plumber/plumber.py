@@ -1,3 +1,4 @@
+import configparser
 import logging
 import os
 import pickle
@@ -6,6 +7,7 @@ import sys
 from . import io
 
 loglevel_default = 'info'
+
 
 class PlumberAnalysis(object):
     """Overarching class for organizing analysis of the PLUMBER dataset.
@@ -56,9 +58,9 @@ class PlumberAnalysis(object):
                 except KeyError:
                     tshift = None
                 for site in self.cfg['sites']['sites']:
-                    infile = self.cfg['filetemplates']\
-                                     [category+'_file_template'].\
-                             format(site=site, model=source)
+                    infile = \
+                        self.cfg['filetemplates'][category+'_file_template'].\
+                        format(site=site, model=source)
                     self.ingest(site, source, infile, read_vars=read_vars,
                                 tshift=tshift)
 
@@ -134,9 +136,9 @@ if __name__ == '__main__':
     # parse configuration file to get logging info
     cfgparser = \
         configparser.ConfigParser(allow_no_value=True,
-                                  interpolation=\
-                                  configparser.ExtendedInterpolation())
-    cfgparser.optionxform = str # preserve case of configuration keys
+                                  interpolation=configparser.
+                                  ExtendedInterpolation())
+    cfgparser.optionxform = str  # preserve case of configuration keys
     cfgparser.read(configfile)
 
     # initiate logging - note that cfgparser.get() returns None when the entry
@@ -153,7 +155,6 @@ if __name__ == '__main__':
     else:
         logger = logging.getLogger()
         logger.disabled = True
-
 
     b = PlumberAnalysis(configfile)
 
