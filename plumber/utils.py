@@ -14,7 +14,7 @@ def budyko(x):
 
 
 def cast(x):
-    for f in (int, float, tobool):
+    for f in (int, float, toBool):
         try:
             return f(x)
         except (TypeError, ValueError):
@@ -22,7 +22,17 @@ def cast(x):
     return x
 
 
-def Lv(T, units='K'):
+def flatten(*args):
+    """flatten a list of lists"""
+    for x in args:
+        if not isinstance(x, str) and hasattr(x, '__iter__'):
+            for y in flatten(*x):
+                yield y
+        else:
+            yield x
+
+
+def lv(T, units='K'):
     """Calculate the latent heat of vaporization as a function of temperature.
        Results are in J/kg
        https://en.wikipedia.org/wiki/Latent_heat
@@ -38,7 +48,7 @@ def Lv(T, units='K'):
     return L
 
 
-def tobool(x):
+def toBool(x):
     """Convert a string to a boolean value. Just throw exception if it does not
        work."""
     if x.lower() == 'true':

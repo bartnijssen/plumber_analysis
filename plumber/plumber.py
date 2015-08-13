@@ -3,7 +3,6 @@ import logging
 import os
 import pickle
 import sys
-
 from . import io
 
 loglevel_default = 'info'
@@ -48,7 +47,7 @@ class PlumberAnalysis(object):
         if source not in self.data_dict[site]:
             self.data_dict[site].append(source)
 
-    def ingestall(self, read_vars='all'):
+    def ingestAll(self, read_vars='all'):
         """Ingest time series for all sites and sources"""
         # Ingest all entries in the models section
         for category in self.cfg['sources']:
@@ -82,16 +81,16 @@ class PlumberAnalysis(object):
         with open(pfile, 'rb') as f:
             return pickle.load(f)
 
-    def restore_data(self, path):
+    def restoreData(self, path):
         """Unpickle the data for all sites and sources"""
         # pickle self.data as separate files. Since we do not restore data
         # by default, we loop over the data_dict
         self.data = {}
         for site in self.data_dict:
             for source in self.data_dict[site]:
-                self.restore_data_atom(path, site, source)
+                self.restoreDataAtom(path, site, source)
 
-    def restore_data_atom(self, path, site, source):
+    def restoreDataAtom(self, path, site, source):
         """Unpickle the data for a single site and source"""
         if site not in self.data:
             self.data[site] = {}

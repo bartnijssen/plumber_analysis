@@ -96,7 +96,7 @@ def ingest(infile, read_vars, tshift=None):
     return df
 
 
-def parseconfig(configfile=None):
+def parseConfig(configfile=None):
     """Parse a configuration file and return the configuration as a
        dictionary"""
     if configfile is None:
