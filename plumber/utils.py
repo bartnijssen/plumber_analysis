@@ -14,7 +14,7 @@ def budyko(x):
 
 
 def cast(x):
-    for f in (int, float, toBool):
+    for f in (int, float, toBool, toNone):
         try:
             return f(x)
         except (TypeError, ValueError):
@@ -55,5 +55,14 @@ def toBool(x):
         return True
     elif x.lower() == 'false':
         return False
+    else:
+        raise ValueError
+
+
+def toNone(x):
+    """Convert a string that spells out 'None' (case insensitive) to the
+       python None value"""
+    if x.lower() == 'none':
+        return None
     else:
         raise ValueError
