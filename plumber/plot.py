@@ -2,8 +2,11 @@
 Plotting functions for plumber
 """
 import matplotlib.pyplot as plt
+import seaborn as sns
 from . import io
 from . import fargs
+from . utils import flatten
+callme = fargs.callFuncBasedOnDict
 
 
 def setupPlotGrid(nrows, ncols, sharex='all', sharey='all', squeeze=None,
@@ -35,8 +38,8 @@ class Plot(object):
         return cls(cfg[section])
 
 
-def plot_a(p, section, *args, **kwargs):
-    """Plot an a
+def plot_mean_diurnal_by_site(p, section, **kwargs):
+    """Plot the mean diurnal cycle by site for selected models
 
     Parameters
     ----------
@@ -50,8 +53,22 @@ def plot_a(p, section, *args, **kwargs):
     fig : matplotlib Figure instance
     """
     info = p.cfg[section]
-    func_args = fargs.selectArgsFromDict(plt.subplots, info)
-    fig, ax = plt.subplots(*func_args)
+    fig, axes = callme(plt.subplots, info, **kwargs)
+    iterax = iter(flatten(axes))
+    for site in p.data:
+        ax = next(iterax)
+        for source in p.data[site]:
+            df = p.data[site][source]
+            df[info['read_vars']].\
+                groupby(lambda x: x.hour +
+                        x.minute/60).mean().plot(ax=ax)
+        for f in (ax.set_xlabel, ax.set_ylabel):
+            try:
+                callme(f, info, **kwargs)
+            except TypeError:
+                pass
 
+    fig.tight_layout()
+    callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
-plotlib = [plot_a]
+plotlib = [plot_mean_diurnal_by_site]
