@@ -1,12 +1,22 @@
 """
 Plotting functions for plumber
 """
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
 from . import io
 from . import fargs
 from . utils import flatten
 callme = fargs.callFuncBasedOnDict
+
+
+def setPlotDefaults(plotdict):
+    """Set plot defaults based on plotdict"""
+    if plotdict is None or not plotdict:
+        return
+    for key, val in plotdict.items():
+        # mpl.rcParams.update({key: val})
+        mpl.rcParams[key] = val
 
 
 def setupPlotGrid(nrows, ncols, sharex='all', sharey='all', squeeze=None,
@@ -52,8 +62,20 @@ def plot_mean_diurnal_by_site(p, section, **kwargs):
     -------
     fig : matplotlib Figure instance
     """
+
+    try:
+        setPlotDefaults(p.cfg['plot_defaults'])
+    except KeyError:
+        pass
     info = p.cfg[section]
-    fig, axes = callme(plt.subplots, info, **kwargs)
+
+    try:
+        info['figsize'] = (info['figwidth'], info['figheight'])
+    except KeyError:
+        info['figsize'] = mpl.rcParams['figure.figsize']
+
+    fig, axes = callme(plt.subplots, info, squeeze=False,
+                       figsize=info['figsize'], **kwargs)
     iterax = iter(flatten(axes))
     for site in p.data:
         ax = next(iterax)
