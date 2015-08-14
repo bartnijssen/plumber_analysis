@@ -48,7 +48,7 @@ class Plot(object):
         return cls(cfg[section])
 
 
-def plot_mean_diurnal_by_site(p, section, **kwargs):
+def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
     """Plot the mean diurnal cycle by site for selected models
 
     Parameters
@@ -93,4 +93,4 @@ def plot_mean_diurnal_by_site(p, section, **kwargs):
     fig.tight_layout()
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
-plotlib = [plot_mean_diurnal_by_site]
+plotlib = [plot_mean_diurnal_by_site_single_var]
