@@ -117,10 +117,12 @@ def parseConfig(configfile=None):
 
     # convert dictionary values. First convert any comma-separated entries
     # to lists, then convert entries to boolean, ints, and floats
+    # strings with a trailing zero are also converted to a list
     for section, options in cfg.items():
         for key, val in options.items():
             if re.search(',', val):
-                cfg[section][key] = [x.strip() for x in val.split(',')]
+                cfg[section][key] = [x.strip() for x in val.split(',')
+                                     if x.strip()]
             if isinstance(cfg[section][key], list):
                 cfg[section][key] = [utils.cast(x) for x in cfg[section][key]]
             else:
