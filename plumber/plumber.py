@@ -2,8 +2,10 @@ import configparser
 import logging
 import os
 import pickle
+import re
 import sys
 from . import io
+from . import plot as plumberplot
 
 loglevel_default = 'info'
 
@@ -74,6 +76,20 @@ class PlumberAnalysis(object):
                 infile = self.cfg['filetemplates'][category+'_file_template'].\
                              format(site=site)
                 self.ingest(site, category, infile, read_vars=read_vars)
+
+    def plot(self, section):
+        """Make plot according to the information in self.cfg[section]"""
+        info = self.cfg[section]
+        plotf = getattr(plumberplot, info['plot'])
+        plotf(self, section)
+
+    def plotAll(self):
+        """Process all plots in self.cfg. This is determined by all sections
+           starting with 'plot_' other than 'plot_defaults'"""
+        plotsections = [x for x in self.cfg
+                        if re.match(u'plot_', x) and not x == 'plot_defaults']
+        for section in plotsections:
+            self.plot(section)
 
     def reparseConfig(self, configfile):
         """Parse a new configuration file without reloading or restoring the
