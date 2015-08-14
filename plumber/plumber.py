@@ -18,7 +18,7 @@ class PlumberAnalysis(object):
         self.cfg = {}
         self.configfile = configfile
         if self.configfile:
-            self.cfg = io.parseconfig(self.configfile)
+            self.cfg = io.parseConfig(self.configfile)
         self.data = {}
         # Since data is not pickled as part of the class instance, we maintain
         # a separate data_dict to help restore_data()
@@ -98,7 +98,7 @@ class PlumberAnalysis(object):
         with open(pfile, 'rb') as f:
             self.data[site][source] = pickle.load(f)
         if site not in self.data_dict:
-            self.data_dict[site] = {}
+            self.data_dict[site] = []
         if source not in self.data_dict[site]:
             self.data_dict[site].append(source)
 
