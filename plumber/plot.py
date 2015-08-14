@@ -85,12 +85,28 @@ def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
             df = p.data[site][source]
             df[info['read_vars']].\
                 groupby(lambda x: x.hour +
-                        x.minute/60).mean().plot(ax=ax)
-        for f in (ax.set_xlabel, ax.set_ylabel):
-            try:
-                callme(f, info, **kwargs)
-            except TypeError:
-                pass
+                        x.minute/60).mean().plot(ax=ax, label=source)
+            ax.legend().set_visible(False)
+
+    for i in range(axes.shape[0]):
+        callme(axes[i][0].set_ylabel, info, **kwargs)
+    for i in range(axes.shape[1]):
+        callme(axes[-1][i].set_xlabel, info, **kwargs)
+
+    iterax = iter(flatten(axes))
+    for site in sites:
+        ax = next(iterax)
+        ax.text(0.05, 0.95, site, horizontalalignment='left',
+                verticalalignment='top', transform=ax.transAxes)
+
+    ax = axes[0][0]
+    try:
+        ax.legend().set_visible(info['legend'])
+    except:
+        pass
+
+    ax.text(0.05, 0.85, info['read_vars'], horizontalalignment='left',
+            verticalalignment='top', transform=ax.transAxes)
 
     fig.tight_layout()
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
