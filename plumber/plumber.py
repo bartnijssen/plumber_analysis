@@ -75,6 +75,13 @@ class PlumberAnalysis(object):
                              format(site=site)
                 self.ingest(site, category, infile, read_vars=read_vars)
 
+    def reparseConfig(self, configfile):
+        """Parse a new configuration file without reloading or restoring the
+           data. Use at your own risk, because it is not guaranteed that your
+           data and your configuration will be in-sync"""
+        if self.configfile:
+            self.cfg = io.parseConfig(self.configfile)
+
     @classmethod
     def restore(cls, path):
         """Unpickle the class instance. The data has to be restored separately
