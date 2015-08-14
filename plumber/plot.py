@@ -77,7 +77,9 @@ def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
     fig, axes = callme(plt.subplots, info, squeeze=False,
                        figsize=info['figsize'], **kwargs)
     iterax = iter(flatten(axes))
-    for site in p.data:
+
+    sites = sorted(p.data)
+    for site in sites:
         ax = next(iterax)
         for source in p.data[site]:
             df = p.data[site][source]
