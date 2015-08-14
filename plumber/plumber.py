@@ -60,8 +60,13 @@ class PlumberAnalysis(object):
                     infile = \
                         self.cfg['filetemplates'][category+'_file_template'].\
                         format(site=site, model=source)
-                    self.ingest(site, source, infile, read_vars=read_vars,
-                                tshift=tshift)
+                    try:
+                        self.ingest(site, source, infile, read_vars=read_vars,
+                                    tshift=tshift)
+                    except ValueError:
+                        print('Failure to read {}'.format(infile))
+                        logging.critical('Failure to read %s', infile)
+                        raise
 
         # Ingest all the observations
         for category in self.cfg['observations']['observations']:
