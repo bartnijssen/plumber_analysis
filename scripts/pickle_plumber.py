@@ -4,7 +4,7 @@ configfile = \
     '/Users/nijssen/Dropbox/data/PLUMBER/'\
     'plumber_analysis/config/plumber.config'
 b = pl.PlumberAnalysis(configfile)
-b.ingestall()
+b.ingestAll()
 ppath = '/Users/nijssen/Dropbox/data/PLUMBER/plumber_analysis/pickles/{}'.\
         format(pickle_id)
 b.store(ppath)
