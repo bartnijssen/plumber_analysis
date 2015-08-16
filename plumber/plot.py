@@ -98,7 +98,7 @@ def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
 
     sites = sorted(p.data)
     for site, ax in zip(sites, flatten(axes)):
-        for source in p.data[site]:
+        for source in sorted(p.data[site]):
             df = p.data[site][source]
             try:
                 df[info['read_vars']].\
