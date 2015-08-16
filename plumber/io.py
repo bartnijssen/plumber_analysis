@@ -83,6 +83,8 @@ def ingest(infile, read_vars, tshift=None):
     # shift on the raw time axis and then decode after
     if tshift:
         ds.time += tshift*60
+    # we don't want partial seconds
+    ds[time_dim].values = ds[time_dim].values.round()
     ds = xray.decode_cf(ds, decode_times=True)
 
     # convert to dataframe
