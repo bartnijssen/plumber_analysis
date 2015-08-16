@@ -117,5 +117,4 @@ def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
     setLegend(axes)
     fig.tight_layout()
 
-plotlib = [plot_mean_diurnal_by_site_single_var]
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
