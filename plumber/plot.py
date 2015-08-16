@@ -10,6 +10,21 @@ from . utils import flatten
 callme = fargs.callFuncBasedOnDict
 
 
+def getFigSize(info):
+    """Create figsize from figwidth and figheight or return default"""
+    try:
+        return (info['figwidth'], info['figheight'])
+    except KeyError:
+        return mpl.rcParams['figure.figsize']
+
+
+def setLegend(axes):
+    """Make the legend visible in selected panels only (top left panel)"""
+    for ax in flatten(axes):
+        ax.legend().set_visible(False)
+    ax = axes[0][0].legend().set_visible(True)
+
+
 def setPlotDefaults(plotdict):
     """Set plot defaults based on plotdict"""
     if plotdict is None or not plotdict:
@@ -17,6 +32,14 @@ def setPlotDefaults(plotdict):
     for key, val in plotdict.items():
         # mpl.rcParams.update({key: val})
         mpl.rcParams[key] = val
+
+
+def setXYLabels(axes, info, **kwargs):
+    """Set the x- and y-axis labels"""
+    for i in range(axes.shape[0]):
+        callme(axes[i][0].set_ylabel, info, **kwargs)
+    for i in range(axes.shape[1]):
+        callme(axes[-1][i].set_xlabel, info, **kwargs)
 
 
 def setupPlotGrid(nrows, ncols, sharex='all', sharey='all', squeeze=None,
@@ -63,52 +86,33 @@ def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
     fig : matplotlib Figure instance
     """
 
-    try:
-        setPlotDefaults(p.cfg['plot_defaults'])
-    except KeyError:
-        pass
+    setPlotDefaults(p.cfg['plot_defaults'])
     info = p.cfg[section]
-
-    try:
-        info['figsize'] = (info['figwidth'], info['figheight'])
-    except KeyError:
-        info['figsize'] = mpl.rcParams['figure.figsize']
+    info['figsize'] = getFigSize(info)
 
     fig, axes = callme(plt.subplots, info, squeeze=False,
                        figsize=info['figsize'], **kwargs)
-    iterax = iter(flatten(axes))
 
     sites = sorted(p.data)
-    for site in sites:
-        ax = next(iterax)
+    for site, ax in zip(sites, flatten(axes)):
         for source in p.data[site]:
             df = p.data[site][source]
-            df[info['read_vars']].\
-                groupby(lambda x: x.hour +
-                        x.minute/60).mean().plot(ax=ax, label=source)
-            ax.legend().set_visible(False)
+            try:
+                df[info['read_vars']].\
+                    groupby(lambda x: x.hour +
+                            x.minute/60).mean().plot(ax=ax, label=source)
+            except KeyError:
+                pass
 
-    for i in range(axes.shape[0]):
-        callme(axes[i][0].set_ylabel, info, **kwargs)
-    for i in range(axes.shape[1]):
-        callme(axes[-1][i].set_xlabel, info, **kwargs)
-
-    iterax = iter(flatten(axes))
-    for site in sites:
-        ax = next(iterax)
+    for site, ax in zip(sites, flatten(axes)):
         ax.text(0.05, 0.95, site, horizontalalignment='left',
                 verticalalignment='top', transform=ax.transAxes)
+    axes[0][0].text(0.05, 0.85, info['read_vars'], horizontalalignment='left',
+                    verticalalignment='top', transform=axes[0][0].transAxes)
 
-    ax = axes[0][0]
-    try:
-        ax.legend().set_visible(info['legend'])
-    except:
-        pass
-
-    ax.text(0.05, 0.85, info['read_vars'], horizontalalignment='left',
-            verticalalignment='top', transform=ax.transAxes)
-
+    setXYLabels(axes, info, **kwargs)
+    setLegend(axes)
     fig.tight_layout()
-    callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
 plotlib = [plot_mean_diurnal_by_site_single_var]
+    callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
