@@ -31,7 +31,10 @@ def setPlotDefaults(plotdict):
         return
     for key, val in plotdict.items():
         # mpl.rcParams.update({key: val})
-        mpl.rcParams[key] = val
+        try:
+            mpl.rcParams[key] = val
+        except KeyError:
+            pass
 
 
 def setXYLabels(axes, info, **kwargs):
