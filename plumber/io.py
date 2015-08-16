@@ -1,9 +1,12 @@
 """
 io module for plumber data
 """
+import configparser
 import logging
 import re
 import xray
+from . import utils
+
 
 def ingest(infile, read_vars, tshift=None):
     """
@@ -27,8 +30,8 @@ def ingest(infile, read_vars, tshift=None):
         data frame with those elements in read_vars that are present in infile
 
     The returned dataframe is not guaranteed to have all the variables that are
-    specified in read_vars. It will only include those that are available. It is
-    up to the user to check for completeness.
+    specified in read_vars. It will only include those that are available. It
+    is up to the user to check for completeness.
     """
 
     # make a copy of read_vars since we don't want to change the list in the
@@ -48,7 +51,7 @@ def ingest(infile, read_vars, tshift=None):
 
     # rename the time dimension to 'time' to make life easier
     if time_dim != 'time':
-        ds.rename({time_dim : 'time'}, inplace=True)
+        ds.rename({time_dim: 'time'}, inplace=True)
 
     # only keep the time dimension, drop the others
     dims = [x for x in ds.dims if x != 'time']
@@ -80,6 +83,8 @@ def ingest(infile, read_vars, tshift=None):
     # shift on the raw time axis and then decode after
     if tshift:
         ds.time += tshift*60
+    # we don't want partial seconds
+    ds[time_dim].values = ds[time_dim].values.round()
     ds = xray.decode_cf(ds, decode_times=True)
 
     # convert to dataframe
@@ -90,3 +95,39 @@ def ingest(infile, read_vars, tshift=None):
     df = df.asfreq('30Min', method='nearest')
 
     return df
+
+
+def parseConfig(configfile=None):
+    """Parse a configuration file and return the configuration as a
+       dictionary"""
+    if configfile is None:
+        return {}
+    cfgparser = \
+        configparser.ConfigParser(allow_no_value=True,
+                                  interpolation=configparser.
+                                  ExtendedInterpolation())
+
+    cfgparser.optionxform = str  # preserve case of configuration keys
+    logging.debug('Reading %s', configfile)
+    cfgparser.read(configfile)
+    # convert the cfgparser to an easier to handle dictionary
+    cfg = {}
+    for section in cfgparser.sections():
+        cfg[section.lower()] = {}
+        for key in cfgparser[section]:
+            cfg[section.lower()][key.lower()] = cfgparser[section][key]
+
+    # convert dictionary values. First convert any comma-separated entries
+    # to lists, then convert entries to boolean, ints, and floats
+    # strings with a trailing zero are also converted to a list
+    for section, options in cfg.items():
+        for key, val in options.items():
+            if re.search(',', val):
+                cfg[section][key] = [x.strip() for x in val.split(',')
+                                     if x.strip()]
+            if isinstance(cfg[section][key], list):
+                cfg[section][key] = [utils.cast(x) for x in cfg[section][key]]
+            else:
+                cfg[section][key] = utils.cast(cfg[section][key])
+    logging.debug('Parsed configuration file %s', configfile)
+    return cfg

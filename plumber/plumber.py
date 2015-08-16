@@ -4,11 +4,11 @@ import os
 import pickle
 import re
 import sys
-
 from . import io
-from . import utils
+from . import plot as plumberplot
 
 loglevel_default = 'info'
+
 
 class PlumberAnalysis(object):
     """Overarching class for organizing analysis of the PLUMBER dataset.
@@ -17,9 +17,10 @@ class PlumberAnalysis(object):
 
     def __init__(self, configfile=None):
         """Initialize PlumberAnalysis instance based on a configuration file"""
+        self.cfg = {}
         self.configfile = configfile
         if self.configfile:
-            self.parseconfig(self.configfile)
+            self.cfg = io.parseConfig(self.configfile)
         self.data = {}
         # Since data is not pickled as part of the class instance, we maintain
         # a separate data_dict to help restore_data()
@@ -48,7 +49,7 @@ class PlumberAnalysis(object):
         if source not in self.data_dict[site]:
             self.data_dict[site].append(source)
 
-    def ingestall(self, read_vars='all'):
+    def ingestAll(self, read_vars='all'):
         """Ingest time series for all sites and sources"""
         # Ingest all entries in the models section
         for category in self.cfg['sources']:
@@ -58,11 +59,16 @@ class PlumberAnalysis(object):
                 except KeyError:
                     tshift = None
                 for site in self.cfg['sites']['sites']:
-                    infile = self.cfg['filetemplates']\
-                                     [category+'_file_template'].\
-                             format(site=site, model=source)
-                    self.ingest(site, source, infile, read_vars=read_vars,
-                                tshift=tshift)
+                    infile = \
+                        self.cfg['filetemplates'][category+'_file_template'].\
+                        format(site=site, model=source)
+                    try:
+                        self.ingest(site, source, infile, read_vars=read_vars,
+                                    tshift=tshift)
+                    except ValueError:
+                        print('Failure to read {}'.format(infile))
+                        logging.critical('Failure to read %s', infile)
+                        raise
 
         # Ingest all the observations
         for category in self.cfg['observations']['observations']:
@@ -71,39 +77,26 @@ class PlumberAnalysis(object):
                              format(site=site)
                 self.ingest(site, category, infile, read_vars=read_vars)
 
-    def parseconfig(self, configfile=None):
-        """Parse a configuration file for PlumberAnalysis"""
-        if configfile:
-            self.configfile = configfile
-        if self.configfile is None:
-            return
-        cfgparser = \
-            configparser.ConfigParser(allow_no_value=True,
-                                      interpolation=\
-                                      configparser.ExtendedInterpolation())
-        cfgparser.optionxform = str # preserve case of configuration keys
-        logging.debug('Reading %s', self.configfile)
-        cfgparser.read(self.configfile)
-        # convert the cfgparser to an easier to handle dictionary
-        self.cfg = {}
-        for section in cfgparser.sections():
-            self.cfg[section.lower()] = {}
-            for key in cfgparser[section]:
-                self.cfg[section.lower()][key.lower()] = \
-                    cfgparser[section][key]
+    def plot(self, section):
+        """Make plot according to the information in self.cfg[section]"""
+        info = self.cfg[section]
+        plotf = getattr(plumberplot, info['plot'])
+        plotf(self, section)
 
-        # convert dictionary values. First convert any comma-separated entries
-        # to lists, then convert entries to boolean, ints, and floats
-        for section, options in self.cfg.items():
-            for key, val in options.items():
-                if re.search(',', val):
-                    self.cfg[section][key] = [x.strip() for x in val.split(',')]
-                if isinstance(self.cfg[section][key], list):
-                    self.cfg[section][key] = \
-                        [utils.cast(x) for x in self.cfg[section][key]]
-                else:
-                    self.cfg[section][key] = utils.cast(self.cfg[section][key])
-        logging.debug('Parsed configuration file %s', self.configfile)
+    def plotAll(self):
+        """Process all plots in self.cfg. This is determined by all sections
+           starting with 'plot_' other than 'plot_defaults'"""
+        plotsections = [x for x in self.cfg
+                        if re.match(u'plot_', x) and not x == 'plot_defaults']
+        for section in plotsections:
+            self.plot(section)
+
+    def reparseConfig(self, configfile):
+        """Parse a new configuration file without reloading or restoring the
+           data. Use at your own risk, because it is not guaranteed that your
+           data and your configuration will be in-sync"""
+        if self.configfile:
+            self.cfg = io.parseConfig(self.configfile)
 
     @classmethod
     def restore(cls, path):
@@ -116,16 +109,16 @@ class PlumberAnalysis(object):
         with open(pfile, 'rb') as f:
             return pickle.load(f)
 
-    def restore_data(self, path):
+    def restoreData(self, path):
         """Unpickle the data for all sites and sources"""
         # pickle self.data as separate files. Since we do not restore data
         # by default, we loop over the data_dict
         self.data = {}
         for site in self.data_dict:
             for source in self.data_dict[site]:
-                self.restore_data_atom(path, site, source)
+                self.restoreDataAtom(path, site, source)
 
-    def restore_data_atom(self, path, site, source):
+    def restoreDataAtom(self, path, site, source):
         """Unpickle the data for a single site and source"""
         if site not in self.data:
             self.data[site] = {}
@@ -133,7 +126,7 @@ class PlumberAnalysis(object):
         with open(pfile, 'rb') as f:
             self.data[site][source] = pickle.load(f)
         if site not in self.data_dict:
-            self.data_dict[site] = {}
+            self.data_dict[site] = []
         if source not in self.data_dict[site]:
             self.data_dict[site].append(source)
 
@@ -170,9 +163,9 @@ if __name__ == '__main__':
     # parse configuration file to get logging info
     cfgparser = \
         configparser.ConfigParser(allow_no_value=True,
-                                  interpolation=\
-                                  configparser.ExtendedInterpolation())
-    cfgparser.optionxform = str # preserve case of configuration keys
+                                  interpolation=configparser.
+                                  ExtendedInterpolation())
+    cfgparser.optionxform = str  # preserve case of configuration keys
     cfgparser.read(configfile)
 
     # initiate logging - note that cfgparser.get() returns None when the entry
@@ -189,7 +182,6 @@ if __name__ == '__main__':
     else:
         logger = logging.getLogger()
         logger.disabled = True
-
 
     b = PlumberAnalysis(configfile)
 
