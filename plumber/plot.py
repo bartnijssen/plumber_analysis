@@ -77,7 +77,7 @@ def setXYLabels(axes, info, **kwargs):
         callme(axes[-1][i].set_xlabel, info, **kwargs)
 
 
-def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
+def plotMeanDiurnalBySiteSingleVar(p, section, **kwargs):
     """Plot the mean diurnal cycle by site for selected models
 
     Parameters
@@ -123,8 +123,8 @@ def plot_mean_diurnal_by_site_single_var(p, section, **kwargs):
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
 
-def plot_hovmuller_doy_vs_hod_by_year(p, section, **kwargs):
-    """Plot a hovmuller plot by year with hour of day on the horizontal axis
+def plotHovmollerDoyVsHodByYear(p, section, **kwargs):
+    """Plot a hovmoller plot by year with hour of day on the horizontal axis
        and day of year on the vertical axis
 
     Parameters
@@ -188,8 +188,8 @@ def plot_hovmuller_doy_vs_hod_by_year(p, section, **kwargs):
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
 
-def plot_hovmuller_doy_vs_hod_by_year_comparison(p, section, **kwargs):
-    """Plot a hovmuller plot by year with hour of day on the horizontal axis
+def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
+    """Plot a hovmoller plot by year with hour of day on the horizontal axis
        and day of year on the vertical axis. Top row will be source 1, seconds
        row will be source 2, and the third row will be source 1-2
 
