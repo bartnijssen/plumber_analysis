@@ -10,5 +10,5 @@ setup(name='plumber_analysis',
       url='http://www.github.com/bartnijssen/plumber_analysis',
       packages=['plumber'],
       py_modules=['plumber.fargs', 'plumber.io', 'plumber.plot',
-                  'plumber.plumber', 'plumber.utils']
+                  'plumber.plumber', 'plumber.stats', 'plumber.utils']
       )
