@@ -291,3 +291,139 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
     return fig, axes
+
+
+def plotHovmollerDoyVsHodMean(p, section, **kwargs):
+    """Plot a hovmoller plot by year with hour of day on the horizontal axis
+       and day of year on the vertical axis averaged over all years
+
+    Parameters
+    ----------
+    Required:
+        p : PlumberAnalysis instance
+        section : key for p.cfg that has info that is specific to this plot,
+                  i.e. p.cfg[section]
+
+    Returns
+    -------
+    fig, axes : matplotlib Figure and Axes instance
+    """
+
+    setPlotDefaults(p.cfg['plot_defaults'])
+    info = p.cfg[section]
+    info['figsize'] = getFigSize(info)
+
+    site = info['site']
+    source = info['source']
+    var = info['read_vars']
+
+    df = p.data[site][source][var]
+
+    nrows = 1
+    ncols = 1
+    fig, axes = callme(plt.subplots, info, nrows=nrows, ncols=ncols,
+                       squeeze=False, figsize=info['figsize'], **kwargs)
+    ax = axes[0][0]
+    cmap = plt.get_cmap(info['cmap'])
+    zlimits = getLimits(info, df.values)
+
+    im = plotHovmollerDoyHod(df, zlimits, cmap, ax)
+
+    if 'label' not in info:
+        info['label'] = var
+
+    extend = determineExtend(df.values, zlimits[0], zlimits[1])
+    callme(fig.colorbar, info, mappable=im, ax=[axes[0][0]],
+           label=info['label'], extend=extend)
+
+    info['ylabel'] = 'Day of year'
+    info['xlabel'] = 'Hour of day'
+
+    ax.text(0.05, 0.95, var, horizontalalignment='left',
+            verticalalignment='top', transform=ax.transAxes)
+    ax.text(0.05, 0.85, '{} @ {}'.format(source, site),
+            horizontalalignment='left', verticalalignment='top',
+            transform=ax.transAxes)
+
+    setXYLabels(axes, info, **kwargs)
+
+    callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
+
+    return fig, axes
+
+
+def plotHovmollerDoyVsHodMeanComparison(p, section, **kwargs):
+    """Plot a hovmoller plot by year with hour of day on the horizontal axis
+       and day of year on the vertical axis averaged over all years. Left panel
+       will be source 1, second panel will be source 2, and the third panel
+       will be source 1-2
+
+    Parameters
+    ----------
+    Required:
+        p : PlumberAnalysis instance
+        section : key for p.cfg that has info that is specific to this plot,
+                  i.e. p.cfg[section]
+
+    Returns
+    -------
+    fig, axes : matplotlib Figure and Axes instance
+    """
+
+    setPlotDefaults(p.cfg['plot_defaults'])
+    info = p.cfg[section]
+    info['figsize'] = getFigSize(info)
+
+    site = info['site']
+    source1, source2 = info['source'][0:2]
+    var = info['read_vars']
+
+    df1 = p.data[site][source1][var]
+    df2 = p.data[site][source2][var]
+    diff = df1 - df2
+
+    nrows = 1
+    ncols = 3
+
+    fig, axes = callme(plt.subplots, info, nrows=nrows, ncols=ncols,
+                       squeeze=False, figsize=info['figsize'], **kwargs)
+
+    cmap = plt.get_cmap(info['cmap'])
+    zlimits = getLimits(info, df1.values+df2.values)
+
+    im = plotHovmollerDoyHod(df1, zlimits, cmap, axes[0][0])
+    im = plotHovmollerDoyHod(df2, zlimits, cmap, axes[0][1])
+
+    extend = determineExtend(df1.values+df2.values, zlimits[0], zlimits[1])
+    callme(fig.colorbar, info, mappable=im, ax=axes[0, 0:2].ravel().tolist(),
+           label=info['label'], extend=extend)
+
+    cmap = plt.get_cmap(info['cmap_diff'])
+    zlimits = getLimits(info, diff.values, '_diff')
+    im = plotHovmollerDoyHod(diff, zlimits, cmap, axes[0][2])
+
+    extend = determineExtend(diff.values, zlimits[0], zlimits[1])
+    callme(fig.colorbar, info, mappable=im, ax=[axes[0, 2]],
+           label='Delta {}'.format(info['label']), extend=extend)
+
+    info['ylabel'] = 'Day of year'
+    info['xlabel'] = 'Hour of day'
+
+    axes[0][0].text(0.05, 0.95, var, horizontalalignment='left',
+                    verticalalignment='top', transform=axes[0][0].transAxes)
+    axes[0][0].text(0.05, 0.85, '{} @ {}'.format(source1, site),
+                    horizontalalignment='left', verticalalignment='top',
+                    transform=axes[0][0].transAxes)
+    axes[0][1].text(0.05, 0.85, '{} @ {}'.format(source2, site),
+                    horizontalalignment='left', verticalalignment='top',
+                    transform=axes[0][1].transAxes)
+    axes[0][2].text(0.05, 0.85, '{} - {}'.format(source1, source2),
+                    horizontalalignment='left', verticalalignment='top',
+                    transform=axes[0][2].transAxes)
+
+    setXYLabels(axes, info, **kwargs)
+
+    callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
+
+    return fig, axes
+
