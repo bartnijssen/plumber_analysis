@@ -10,6 +10,21 @@ from . utils import flatten
 callme = fargs.callFuncBasedOnDict
 
 
+def determineExtend(calc_data, vmin, vmax):
+    """Determine whether colorbar should be extended"""
+    extend_min = calc_data.min() < vmin
+    extend_max = calc_data.max() > vmax
+    if extend_min and extend_max:
+        extend = 'both'
+    elif extend_min:
+        extend = 'min'
+    elif extend_max:
+        extend = 'max'
+    else:
+        extend = 'neither'
+    return extend
+
+
 def getFigSize(info):
     """Create figsize from figwidth and figheight or return default"""
     try:
@@ -168,8 +183,9 @@ def plotHovmollerDoyVsHodByYear(p, section, **kwargs):
     if 'label' not in info:
         info['label'] = var
 
+    extend = determineExtend(d.valuess, zlimits[0], zlimits[1])
     callme(fig.colorbar, info, mappable=im, ax=axes.ravel().tolist(),
-           label=info['label'])
+           label=info['label'], extend=extend)
 
     info['ylabel'] = 'Day of year'
     info['xlabel'] = 'Hour of day'
@@ -233,8 +249,9 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
             df = d[str(year)]
             im = plotHovmollerDoyHod(df, zlimits, cmap, ax)
 
+    extend = determineExtend(d1.values+d2.valuess, zlimits[0], zlimits[1])
     callme(fig.colorbar, info, mappable=im, ax=axes[0:2, :].ravel().tolist(),
-           label=info['label'])
+           label=info['label'], extend=extend)
 
     d = d1 - d2
     cmap = plt.get_cmap(info['cmap_diff'])
@@ -243,8 +260,9 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
         df = d[str(year)]
         im = plotHovmollerDoyHod(df, zlimits, cmap, ax)
 
+    extend = determineExtend(d.values, zlimits[0], zlimits[1])
     callme(fig.colorbar, info, mappable=im, ax=axes[2, :].ravel().tolist(),
-           label='Delta {}'.format(info['label']))
+           label='Delta {}'.format(info['label']), extend=extend)
 
     info['ylabel'] = 'Day of year'
     info['xlabel'] = 'Hour of day'
