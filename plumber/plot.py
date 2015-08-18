@@ -104,7 +104,7 @@ def plotMeanDiurnalBySiteSingleVar(p, section, **kwargs):
 
     Returns
     -------
-    fig : matplotlib Figure instance
+    fig, axes : matplotlib Figure and Axes instance
     """
 
     setPlotDefaults(p.cfg['plot_defaults'])
@@ -137,6 +137,8 @@ def plotMeanDiurnalBySiteSingleVar(p, section, **kwargs):
 
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
+    return fig, axes
+
 
 def plotHovmollerDoyVsHodByYear(p, section, **kwargs):
     """Plot a hovmoller plot by year with hour of day on the horizontal axis
@@ -151,7 +153,7 @@ def plotHovmollerDoyVsHodByYear(p, section, **kwargs):
 
     Returns
     -------
-    fig : matplotlib Figure instance
+    fig, axes : matplotlib Figure and Axes instance
     """
 
     setPlotDefaults(p.cfg['plot_defaults'])
@@ -203,6 +205,8 @@ def plotHovmollerDoyVsHodByYear(p, section, **kwargs):
 
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
 
+    return fig, axes
+
 
 def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
     """Plot a hovmoller plot by year with hour of day on the horizontal axis
@@ -218,7 +222,7 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
 
     Returns
     -------
-    fig : matplotlib Figure instance
+    fig, axes : matplotlib Figure and Axes instance
     """
 
     setPlotDefaults(p.cfg['plot_defaults'])
@@ -285,3 +289,5 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
     setXYLabels(axes, info, **kwargs)
 
     callme(fig.savefig, info, filename=info['plotfilename'], **kwargs)
+
+    return fig, axes
