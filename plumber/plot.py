@@ -18,18 +18,18 @@ def getFigSize(info):
         return mpl.rcParams['figure.figsize']
 
 
-def getLimits(info, values):
+def getLimits(info, values, qualifier=''):
     """Get the range of values"""
     try:
-        low = info['lower']
+        low = info['lower'+qualifier]
     except KeyError:
         low = np.nanmin(values)
     try:
-        high = info['upper']
+        high = info['upper'+qualifier]
     except KeyError:
         high = np.nanmax(values)
     try:
-        if info['symmetric']:
+        if info['symmetric'+qualifier]:
             limit = np.abs([np.nanmax(values), np.nanmin(values)]).max()
             low = -limit
             high = limit
@@ -238,7 +238,7 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
 
     d = d1 - d2
     cmap = plt.get_cmap(info['cmap_diff'])
-    zlimits = getLimits(info, d.values)
+    zlimits = getLimits(info, d.values, '_diff')
     for ax, year in zip(axes[2, :].flat, years):
         df = d[str(year)]
         im = plotHovmollerDoyHod(df, zlimits, cmap, ax)
