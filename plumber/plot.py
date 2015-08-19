@@ -192,14 +192,9 @@ def plotHovmollerDoyVsHodByYear(p, section, **kwargs):
     info['ylabel'] = 'Day of year'
     info['xlabel'] = 'Hour of day'
 
-    for ax, year in zip(axes.flat, years):
-        ax.text(0.05, 0.95, year, horizontalalignment='left',
-                verticalalignment='top', transform=ax.transAxes)
-    axes[0][0].text(0.05, 0.85, var, horizontalalignment='left',
-                    verticalalignment='top', transform=axes[0][0].transAxes)
-    axes[0][0].text(0.05, 0.75, '{} @ {}'.format(source, site),
-                    horizontalalignment='left', verticalalignment='top',
-                    transform=axes[0][0].transAxes)
+    fig.suptitle('{} @ {}: {}'.format(source, site, var))
+    for ax, year in zip(axes[0, :].flat, years):
+        ax.set_title(year)
 
     setXYLabels(axes, info, **kwargs)
 
@@ -253,7 +248,7 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
             df = d[str(year)]
             im = plotHovmollerDoyHod(df, zlimits, cmap, ax)
 
-    extend = determineExtend(d1.values+d2.valuess, zlimits[0], zlimits[1])
+    extend = determineExtend(d1.values+d2.values, zlimits[0], zlimits[1])
     callme(fig.colorbar, info, mappable=im, ax=axes[0:2, :].ravel().tolist(),
            label=info['label'], extend=extend)
 
@@ -271,18 +266,15 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
     info['ylabel'] = 'Day of year'
     info['xlabel'] = 'Hour of day'
 
+    fig.suptitle('{} and {} @ {}: {}'.format(source1, source2, site, var))
     for ax, year in zip(axes[0, :].flat, years):
-        ax.text(0.05, 0.95, year, horizontalalignment='left',
-                verticalalignment='top', transform=ax.transAxes)
-    axes[0][0].text(0.05, 0.85, var, horizontalalignment='left',
+        ax.set_title(year)
+    axes[0][0].text(0.05, 0.95, source1, horizontalalignment='left',
                     verticalalignment='top', transform=axes[0][0].transAxes)
-    axes[0][0].text(0.05, 0.75, '{} @ {}'.format(source1, site),
-                    horizontalalignment='left', verticalalignment='top',
-                    transform=axes[0][0].transAxes)
-    axes[1][0].text(0.05, 0.75, '{} @ {}'.format(source2, site),
+    axes[1][0].text(0.05, 0.95, source2,
                     horizontalalignment='left', verticalalignment='top',
                     transform=axes[1][0].transAxes)
-    axes[2][0].text(0.05, 0.75, '{} - {}'.format(source1, source2),
+    axes[2][0].text(0.05, 0.95, 'Delta (1-2)',
                     horizontalalignment='left', verticalalignment='top',
                     transform=axes[2][0].transAxes)
 
@@ -339,11 +331,7 @@ def plotHovmollerDoyVsHodMean(p, section, **kwargs):
     info['ylabel'] = 'Day of year'
     info['xlabel'] = 'Hour of day'
 
-    ax.text(0.05, 0.95, var, horizontalalignment='left',
-            verticalalignment='top', transform=ax.transAxes)
-    ax.text(0.05, 0.85, '{} @ {}'.format(source, site),
-            horizontalalignment='left', verticalalignment='top',
-            transform=ax.transAxes)
+    fig.suptitle('{} @ {}: {}'.format(source, site, var))
 
     setXYLabels(axes, info, **kwargs)
 
@@ -409,17 +397,10 @@ def plotHovmollerDoyVsHodMeanComparison(p, section, **kwargs):
     info['ylabel'] = 'Day of year'
     info['xlabel'] = 'Hour of day'
 
-    axes[0][0].text(0.05, 0.95, var, horizontalalignment='left',
-                    verticalalignment='top', transform=axes[0][0].transAxes)
-    axes[0][0].text(0.05, 0.85, '{} @ {}'.format(source1, site),
-                    horizontalalignment='left', verticalalignment='top',
-                    transform=axes[0][0].transAxes)
-    axes[0][1].text(0.05, 0.85, '{} @ {}'.format(source2, site),
-                    horizontalalignment='left', verticalalignment='top',
-                    transform=axes[0][1].transAxes)
-    axes[0][2].text(0.05, 0.85, '{} - {}'.format(source1, source2),
-                    horizontalalignment='left', verticalalignment='top',
-                    transform=axes[0][2].transAxes)
+    fig.suptitle('{} and {} @ {}: {}'.format(source1, source2, site, var))
+    axes[0][0].set_title(source1)
+    axes[0][1].set_title(source2)
+    axes[0][2].set_title('Delta (1-2)')
 
     setXYLabels(axes, info, **kwargs)
 

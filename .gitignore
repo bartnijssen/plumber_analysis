@@ -9,3 +9,5 @@ output/
 plots/
 # exclude logs
 logs/
+# exclude vic
+vic/
