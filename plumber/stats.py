@@ -10,15 +10,17 @@ import pandas as pd
 def calcAllStats(df1, df2):
     """Calculate all the stats and return dict"""
     stats = {}
-    stats['meanBiasError'] = meanBiasError(df1, df2)
-    stats['relativeStandardDeviation'] = relativeStandardDeviation(df1, df2)
-    stats['correlationCoefficient'] = correlationCoefficient(df1, df2)
-    stats['normalizedMeanError'] = normalizedMeanError(df1, df2)
-    stats['absoluteDiffPercentile_5'] = absoluteDiffPercentile(df1, df2, 0.05)
-    stats['absoluteDiffPercentile_95'] = absoluteDiffPercentile(df1, df2, 0.95)
-    stats['absoluteDiffSkewness'] = absoluteDiffSkewness(df1, df2)
-    stats['absoluteDiffKurtosis'] = absoluteDiffKurtosis(df1, df2)
-    stats['histOverlap'] = histOverlap(df1, df2)
+    stats['Absolute bias'] = meanBiasError(df1, df2)
+    stats['1 - stdev ratio'] = relativeStandardDeviation(df1, df2)
+    stats['1 - Correlation'] = correlationMeasure(df1, df2)
+    stats['Normalized mean absolute error'] = normalizedMeanError(df1, df2)
+    stats['Difference in 5th percentile'] = absoluteDiffPercentile(df1,
+                                                                   df2, 0.05)
+    stats['Difference in 95th percentile'] = absoluteDiffPercentile(df1,
+                                                                    df2, 0.95)
+    stats['1 - skewness ratio'] = relativeSkewness(df1, df2)
+    stats['1 - kurtosis ratio'] = relativeKurtosis(df1, df2)
+    stats['1 - overlap statistic'] = 1 - histOverlap(df1, df2)
     return stats
 
 
@@ -28,14 +30,14 @@ def meanBiasError(df1, df2):
 
 
 def relativeStandardDeviation(df1, df2):
-    """The absolute difference between 1.0 and the ratio of the standard
+    """The difference between 1.0 and the ratio of the standard
        deviations of d1 and d2"""
     return abs(1 - df1.std()/df2.std())
 
 
-def correlationCoefficient(df1, df2):
+def correlationMeasure(df1, df2):
     """Correlation coefficient between d1 and d2"""
-    return df1.corrwith(df2)
+    return 1 - df1.corrwith(df2)
 
 
 def normalizedMeanError(df1, df2):
@@ -48,14 +50,16 @@ def absoluteDiffPercentile(df1, df2, percentile=0.5):
     return abs(df1.quantile(percentile) - df2.quantile(percentile))
 
 
-def absoluteDiffSkewness(df1, df2):
-    """Absolute difference in skewness between df1 and df2"""
-    return abs(df1.skew() - df2.skew())
+def relativeSkewness(df1, df2):
+    """The difference between 1.0 and the ratio of the skewness
+       of d1 and d2"""
+    return abs(1 - df1.skew() / df2.skew())
 
 
-def absoluteDiffKurtosis(df1, df2):
-    """Absolute difference in kurtosis between df1 and df2"""
-    return abs(df1.kurt() - df2.kurt())
+def relativeKurtosis(df1, df2):
+    """The difference between 1.0 and the ratio of the kurtosis
+       of d1 and d2"""
+    return abs(1 - df1.kurt() / df2.kurt())
 
 
 def histOverlap(df1, df2, nbins=25):
