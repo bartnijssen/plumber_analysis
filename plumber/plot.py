@@ -248,7 +248,7 @@ def plotHovmollerDoyVsHodByYearComparison(p, section, **kwargs):
             df = d[str(year)]
             im = plotHovmollerDoyHod(df, zlimits, cmap, ax)
 
-    extend = determineExtend(d1.values+d2.valuess, zlimits[0], zlimits[1])
+    extend = determineExtend(d1.values+d2.values, zlimits[0], zlimits[1])
     callme(fig.colorbar, info, mappable=im, ax=axes[0:2, :].ravel().tolist(),
            label=info['label'], extend=extend)
 
