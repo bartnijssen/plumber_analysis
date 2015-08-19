@@ -11,3 +11,5 @@ plots/
 logs/
 # exclude vic
 vic/
+# exclude papers
+papers/
