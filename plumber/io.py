@@ -44,7 +44,11 @@ def ingest(infile, read_vars, tshift=None):
             raise
 
     # read infile using xray
-    ds = xray.open_dataset(infile, decode_times=False)
+    try:
+        ds = xray.open_dataset(infile, decode_times=False)
+    except RuntimeError as err:
+        logging.critical('%s: failed to read: %s', err, infile)
+        raise
 
     # find the time dimension
     time_dim = [x for x in ds.dims if re.search('time', x, re.I)][0]
